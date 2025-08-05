@@ -326,13 +326,19 @@ class TestDataCache:
     
     def test_cache_access_time_update(self, cache):
         """Test that accessing items updates their access time."""
-        # Add items
+        import time
+        
+        # Add items with small delays to ensure different timestamps
         cache.put('key1', 'value1')
+        time.sleep(0.01)
         cache.put('key2', 'value2')
+        time.sleep(0.01)
         cache.put('key3', 'value3')
+        time.sleep(0.01)
         
         # Access key1 to update its access time
         cache.get('key1')
+        time.sleep(0.01)
         
         # Add new item (should evict key2, not key1)
         cache.put('key4', 'value4')

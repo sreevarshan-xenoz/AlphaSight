@@ -253,7 +253,7 @@ class DataStorage:
         """
         try:
             cutoff_date = datetime.now() - timedelta(days=self.rolling_window_days)
-            cutoff_period = cutoff_date.to_period('M')
+            cutoff_period = pd.Timestamp(cutoff_date).to_period('M')
             
             cleaned_files = 0
             
@@ -453,6 +453,12 @@ class DataCache:
             key: Cache key
             value: Value to cache
         """
+        # If key already exists, just update it
+        if key in self._cache:
+            self._cache[key] = value
+            self._access_times[key] = datetime.now()
+            return
+        
         # Remove oldest item if cache is full
         if len(self._cache) >= self.max_size:
             oldest_key = min(self._access_times.keys(), key=lambda k: self._access_times[k])
