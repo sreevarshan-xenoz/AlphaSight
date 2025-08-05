@@ -283,8 +283,9 @@ class NewsDataCollector(DataCollector):
     def _parse_news_response(self, response_text: str, source: str, start_date: datetime, end_date: datetime) -> List[Dict[str, Any]]:
         """Parse news response and extract relevant information.
         
-        This is a simplified implementation. In production, you would use
-        proper RSS/XML parsing libraries like feedparser.
+        This is a simplified implementation for demonstration. In production, 
+        you would use proper RSS/XML parsing libraries like feedparser or 
+        integrate with actual Economic Times API.
         
         Args:
             response_text: Raw response text
@@ -295,30 +296,41 @@ class NewsDataCollector(DataCollector):
         Returns:
             List[Dict]: Parsed news items
         """
-        # Simplified mock implementation
-        # In production, this would parse actual RSS/XML content
-        mock_news = [
-            {
-                'headline': f'NIFTY 50 shows strong performance in market session - {source}',
-                'timestamp': datetime.now() - timedelta(days=1),
-                'source': source,
-                'url': f'https://example.com/news/{source}/1'
-            },
-            {
-                'headline': f'Market volatility affects major indices including NIFTY - {source}',
-                'timestamp': datetime.now() - timedelta(days=2),
-                'source': source,
-                'url': f'https://example.com/news/{source}/2'
-            }
+        import re
+        from datetime import datetime, timedelta
+        
+        # For demonstration, create realistic mock news data
+        # In production, this would parse actual RSS/XML content or API responses
+        base_headlines = [
+            "NIFTY 50 closes higher amid positive market sentiment",
+            "Banking stocks drive NIFTY gains in today's session",
+            "Market volatility continues as NIFTY shows mixed signals",
+            "NIFTY 50 reaches new monthly high on strong buying interest",
+            "Sectoral rotation impacts NIFTY performance",
+            "Foreign institutional investors boost NIFTY momentum",
+            "NIFTY consolidates after recent rally, traders cautious",
+            "IT stocks weigh on NIFTY despite overall market strength",
+            "NIFTY breaks key resistance level on heavy volumes",
+            "Market experts predict NIFTY direction for next week"
         ]
         
-        # Filter by date range
-        filtered_news = [
-            news for news in mock_news
-            if start_date <= news['timestamp'] <= end_date
-        ]
+        mock_news = []
+        current_time = datetime.now()
         
-        return filtered_news
+        # Generate realistic news items within the date range
+        for i, headline in enumerate(base_headlines):
+            news_date = current_time - timedelta(days=i+1)
+            
+            # Only include news within the specified date range
+            if start_date <= news_date <= end_date:
+                mock_news.append({
+                    'headline': f'{headline} - {source}',
+                    'timestamp': news_date,
+                    'source': source,
+                    'url': f'https://economictimes.indiatimes.com/markets/stocks/news/{i+1}'
+                })
+        
+        return mock_news
     
     def _filter_relevant_news(self, df: pd.DataFrame, days: int = 30) -> pd.DataFrame:
         """Filter news for relevance within specified days.
@@ -365,6 +377,51 @@ class NewsDataCollector(DataCollector):
         except Exception as e:
             logger.error(f"News data validation failed: {str(e)}")
             return False
+    
+    def handle_missing_news_data(self, symbol: str, date: datetime) -> List[Dict[str, Any]]:
+        """Handle missing or stale news data by providing fallback content.
+        
+        Args:
+            symbol: Symbol for which news is missing
+            date: Date for which news is needed
+            
+        Returns:
+            List[Dict]: Fallback news items
+        """
+        logger.warning(f"No recent news found for {symbol} on {date}. Using fallback data.")
+        
+        # Provide neutral fallback news to avoid bias
+        fallback_news = [{
+            'headline': f'Market update: {symbol} trading continues with normal activity',
+            'timestamp': date,
+            'source': 'fallback',
+            'url': None,
+            'is_fallback': True
+        }]
+        
+        return fallback_news
+    
+    def check_news_freshness(self, news_items: List[Dict[str, Any]], max_age_hours: int = 24) -> List[Dict[str, Any]]:
+        """Check news freshness and filter out stale news.
+        
+        Args:
+            news_items: List of news items to check
+            max_age_hours: Maximum age in hours for news to be considered fresh
+            
+        Returns:
+            List[Dict]: Fresh news items only
+        """
+        current_time = datetime.now()
+        fresh_news = []
+        
+        for news in news_items:
+            news_age = current_time - news['timestamp']
+            if news_age.total_seconds() / 3600 <= max_age_hours:
+                fresh_news.append(news)
+            else:
+                logger.info(f"Filtering out stale news: {news['headline'][:50]}... (age: {news_age})")
+        
+        return fresh_news
     
     def convert_to_news_data_objects(self, df: pd.DataFrame) -> List[NewsData]:
         """Convert DataFrame to list of NewsData objects.

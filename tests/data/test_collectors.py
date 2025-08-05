@@ -1,6 +1,7 @@
 # tests/data/test_collectors.py
 import pytest
 import pandas as pd
+import requests
 from datetime import datetime, timedelta
 from unittest.mock import Mock, patch, MagicMock
 import numpy as np
@@ -23,8 +24,8 @@ class TestNSEDataCollector:
         dates = pd.date_range(start='2024-01-01', end='2024-01-05', freq='D')
         data = pd.DataFrame({
             'Open': [22000.0, 22100.0, 22050.0, 22200.0, 22150.0],
-            'High': [22150.0, 22200.0, 22180.0, 22300.0, 22250.0],
-            'Low': [21950.0, 22000.0, 21980.0, 22100.0, 22050.0],
+            'High': [22150.0, 22200.0, 22200.0, 22300.0, 22250.0],  # Fixed: High >= max(Open, Close)
+            'Low': [21950.0, 22000.0, 22000.0, 22100.0, 22050.0],   # Fixed: Low <= min(Open, Close)
             'Close': [22100.0, 22050.0, 22200.0, 22150.0, 22200.0],
             'Volume': [1000000, 1100000, 950000, 1200000, 1050000]
         }, index=dates)
@@ -173,8 +174,8 @@ class TestNSEDataCollector:
         # Create data with one invalid row (negative price)
         invalid_data = pd.DataFrame({
             'Open': [22000.0, -22100.0, 22050.0],  # Second row has negative open
-            'High': [22150.0, 22200.0, 22180.0],
-            'Low': [21950.0, 22000.0, 21980.0],
+            'High': [22150.0, 22200.0, 22200.0],   # Fixed: High >= max(Open, Close)
+            'Low': [21950.0, 22000.0, 22000.0],    # Fixed: Low <= min(Open, Close)
             'Close': [22100.0, 22050.0, 22200.0],
             'Volume': [1000000, 1100000, 950000]
         }, index=pd.date_range(start='2024-01-01', periods=3))
@@ -331,6 +332,47 @@ class TestNewsDataCollector:
         assert len(news_data_list) == 2
         assert all(isinstance(item, NewsData) for item in news_data_list)
         assert all(item.headline.strip() != '' for item in news_data_list)
+    
+    def test_handle_missing_news_data(self, collector):
+        """Test handling of missing news data."""
+        symbol = 'NIFTY 50'
+        date = datetime(2024, 1, 1)
+        
+        fallback_news = collector.handle_missing_news_data(symbol, date)
+        
+        assert len(fallback_news) == 1
+        assert fallback_news[0]['headline'].startswith('Market update:')
+        assert fallback_news[0]['timestamp'] == date
+        assert fallback_news[0]['source'] == 'fallback'
+        assert fallback_news[0]['is_fallback'] is True
+    
+    def test_check_news_freshness(self, collector):
+        """Test news freshness checking."""
+        current_time = datetime.now()
+        news_items = [
+            {
+                'headline': 'Fresh news',
+                'timestamp': current_time - timedelta(hours=1),  # Fresh
+                'source': 'test'
+            },
+            {
+                'headline': 'Stale news',
+                'timestamp': current_time - timedelta(hours=25),  # Stale
+                'source': 'test'
+            },
+            {
+                'headline': 'Another fresh news',
+                'timestamp': current_time - timedelta(hours=12),  # Fresh
+                'source': 'test'
+            }
+        ]
+        
+        fresh_news = collector.check_news_freshness(news_items, max_age_hours=24)
+        
+        assert len(fresh_news) == 2
+        assert 'Fresh news' in [item['headline'] for item in fresh_news]
+        assert 'Another fresh news' in [item['headline'] for item in fresh_news]
+        assert 'Stale news' not in [item['headline'] for item in fresh_news]
 
 
 if __name__ == '__main__':
