@@ -9,10 +9,15 @@ This module provides the core orchestration components for the NIFTY 50 ML Pipel
 
 from .controller import PipelineController, PipelineStatus, StageResult
 from .scheduler import TaskScheduler
+from .error_handler import ErrorHandler, ErrorContext, RecoveryAction, ErrorSeverity
 
 __all__ = [
     'PipelineController',
     'PipelineStatus', 
     'StageResult',
-    'TaskScheduler'
+    'TaskScheduler',
+    'ErrorHandler',
+    'ErrorContext',
+    'RecoveryAction',
+    'ErrorSeverity'
 ]

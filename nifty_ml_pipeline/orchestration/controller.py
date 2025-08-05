@@ -16,6 +16,7 @@ from ..models.predictor import XGBoostPredictor
 from ..models.inference_engine import InferenceEngine
 from ..data.storage import DataStorage
 from ..data.models import PipelineResult, PipelineStage
+from .error_handler import ErrorHandler, ErrorContext, RecoveryAction
 
 
 logger = logging.getLogger(__name__)
@@ -64,6 +65,9 @@ class PipelineController:
         
         # Initialize components
         self._initialize_components()
+        
+        # Initialize error handler
+        self.error_handler = ErrorHandler(config)
         
         logger.info(f"Pipeline controller initialized with execution ID: {self.execution_id}")
     
@@ -146,7 +150,7 @@ class PipelineController:
             return self._create_error_result(symbol, str(e))
     
     def _execute_data_collection_stage(self, symbol: str) -> tuple[pd.DataFrame, pd.DataFrame]:
-        """Execute data collection stage.
+        """Execute data collection stage with error handling and recovery.
         
         Args:
             symbol: Symbol to collect data for
@@ -155,63 +159,109 @@ class PipelineController:
             Tuple of (price_data, news_data) DataFrames
         """
         stage_start = time.perf_counter()
+        attempt = 1
+        max_attempts = 3
         
-        try:
-            logger.info("Starting data collection stage")
-            
-            # Calculate date range for rolling window
-            end_date = datetime.now()
-            start_date = end_date - timedelta(days=self.config['data']['retention_days'])
-            
-            # Collect price data
-            logger.info(f"Collecting price data for {symbol}")
-            price_data = self.nse_collector.collect_data(symbol, start_date, end_date)
-            
-            # Collect news data
-            logger.info(f"Collecting news data for {symbol}")
-            news_data = self.news_collector.collect_data(symbol, start_date, end_date)
-            
-            # Store collected data
-            self.storage.store_price_data(price_data, symbol)
-            self.storage.store_news_data(news_data, symbol)
-            
-            stage_end = time.perf_counter()
-            duration_ms = (stage_end - stage_start) * 1000
-            
-            # Record stage result
-            stage_result = StageResult(
-                stage=PipelineStage.DATA_COLLECTION,
-                status=PipelineStatus.COMPLETED,
-                duration_ms=duration_ms,
-                data_count=len(price_data) + len(news_data),
-                metadata={
-                    'price_records': len(price_data),
-                    'news_records': len(news_data),
-                    'date_range': f"{start_date.date()} to {end_date.date()}"
-                }
-            )
-            self.stage_results.append(stage_result)
-            
-            logger.info(f"Data collection completed in {duration_ms:.2f}ms")
-            logger.info(f"Collected {len(price_data)} price records and {len(news_data)} news records")
-            
-            return price_data, news_data
-            
-        except Exception as e:
-            stage_end = time.perf_counter()
-            duration_ms = (stage_end - stage_start) * 1000
-            
-            stage_result = StageResult(
-                stage=PipelineStage.DATA_COLLECTION,
-                status=PipelineStatus.FAILED,
-                duration_ms=duration_ms,
-                data_count=0,
-                error_message=str(e)
-            )
-            self.stage_results.append(stage_result)
-            
-            logger.error(f"Data collection stage failed: {e}")
-            raise
+        while attempt <= max_attempts:
+            try:
+                logger.info(f"Starting data collection stage (attempt {attempt}/{max_attempts})")
+                
+                # Calculate date range for rolling window
+                end_date = datetime.now()
+                start_date = end_date - timedelta(days=self.config['data']['retention_days'])
+                
+                # Collect price data
+                logger.info(f"Collecting price data for {symbol}")
+                price_data = self.nse_collector.collect_data(symbol, start_date, end_date)
+                
+                # Collect news data
+                logger.info(f"Collecting news data for {symbol}")
+                news_data = self.news_collector.collect_data(symbol, start_date, end_date)
+                
+                # Store collected data
+                self.storage.store_price_data(price_data, symbol)
+                self.storage.store_news_data(news_data, symbol)
+                
+                stage_end = time.perf_counter()
+                duration_ms = (stage_end - stage_start) * 1000
+                
+                # Record successful stage result
+                stage_result = StageResult(
+                    stage=PipelineStage.DATA_COLLECTION,
+                    status=PipelineStatus.COMPLETED,
+                    duration_ms=duration_ms,
+                    data_count=len(price_data) + len(news_data),
+                    metadata={
+                        'price_records': len(price_data),
+                        'news_records': len(news_data),
+                        'date_range': f"{start_date.date()} to {end_date.date()}",
+                        'attempts_made': attempt
+                    }
+                )
+                self.stage_results.append(stage_result)
+                
+                logger.info(f"Data collection completed in {duration_ms:.2f}ms")
+                logger.info(f"Collected {len(price_data)} price records and {len(news_data)} news records")
+                
+                return price_data, news_data
+                
+            except Exception as e:
+                # Create error context
+                error_context = ErrorContext(
+                    stage=PipelineStage.DATA_COLLECTION,
+                    error=e,
+                    timestamp=datetime.now(),
+                    execution_id=self.execution_id,
+                    attempt_number=attempt,
+                    metadata={'symbol': symbol}
+                )
+                
+                # Handle error with recovery strategy
+                recovery_result = self.error_handler.handle_error(error_context)
+                
+                if recovery_result.action_taken == RecoveryAction.RETRY and attempt < max_attempts:
+                    attempt += 1
+                    time.sleep(2)  # Brief delay before retry
+                    continue
+                elif recovery_result.action_taken == RecoveryAction.USE_FALLBACK and recovery_result.data:
+                    # Use fallback data
+                    price_data, news_data = recovery_result.data
+                    
+                    stage_end = time.perf_counter()
+                    duration_ms = (stage_end - stage_start) * 1000
+                    
+                    stage_result = StageResult(
+                        stage=PipelineStage.DATA_COLLECTION,
+                        status=PipelineStatus.PARTIAL_SUCCESS,
+                        duration_ms=duration_ms,
+                        data_count=len(price_data) + len(news_data),
+                        metadata={
+                            'used_fallback_data': True,
+                            'original_error': str(e),
+                            'attempts_made': attempt
+                        }
+                    )
+                    self.stage_results.append(stage_result)
+                    
+                    logger.warning(f"Using fallback data for data collection stage")
+                    return price_data, news_data
+                else:
+                    # Record failed stage result
+                    stage_end = time.perf_counter()
+                    duration_ms = (stage_end - stage_start) * 1000
+                    
+                    stage_result = StageResult(
+                        stage=PipelineStage.DATA_COLLECTION,
+                        status=PipelineStatus.FAILED,
+                        duration_ms=duration_ms,
+                        data_count=0,
+                        error_message=str(e),
+                        metadata={'attempts_made': attempt}
+                    )
+                    self.stage_results.append(stage_result)
+                    
+                    logger.error(f"Data collection stage failed after {attempt} attempts: {e}")
+                    raise
     
     def _execute_feature_engineering_stage(self, price_data: pd.DataFrame, 
                                          news_data: pd.DataFrame) -> pd.DataFrame:
