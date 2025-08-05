@@ -557,17 +557,19 @@ class PerformanceMonitor:
             'alerts': recent_alerts
         }
         
-        # Convert datetime objects to ISO strings for JSON serialization
-        def convert_datetime(obj):
+        # Convert datetime objects and enums to JSON serializable format
+        def convert_for_json(obj):
             if isinstance(obj, datetime):
                 return obj.isoformat()
+            elif isinstance(obj, (MetricType, AlertLevel, PipelineStage)):
+                return obj.value
             elif isinstance(obj, dict):
-                return {k: convert_datetime(v) for k, v in obj.items()}
+                return {k: convert_for_json(v) for k, v in obj.items()}
             elif isinstance(obj, list):
-                return [convert_datetime(item) for item in obj]
+                return [convert_for_json(item) for item in obj]
             return obj
         
-        export_data = convert_datetime(export_data)
+        export_data = convert_for_json(export_data)
         
         with open(filepath, 'w') as f:
             json.dump(export_data, f, indent=2)

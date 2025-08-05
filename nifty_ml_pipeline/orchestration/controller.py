@@ -17,6 +17,7 @@ from ..models.inference_engine import InferenceEngine
 from ..data.storage import DataStorage
 from ..data.models import PipelineResult, PipelineStage
 from .error_handler import ErrorHandler, ErrorContext, RecoveryAction
+from .performance_monitor import PerformanceMonitor, MetricType
 
 
 logger = logging.getLogger(__name__)
@@ -68,6 +69,9 @@ class PipelineController:
         
         # Initialize error handler
         self.error_handler = ErrorHandler(config)
+        
+        # Initialize performance monitor
+        self.performance_monitor = PerformanceMonitor(config)
         
         logger.info(f"Pipeline controller initialized with execution ID: {self.execution_id}")
     
@@ -136,6 +140,16 @@ class PipelineController:
             self.end_time = datetime.now()
             
             result = self._create_pipeline_result(symbol, predictions)
+            
+            # Record pipeline execution metrics
+            self.performance_monitor.record_pipeline_execution(
+                execution_id=self.execution_id,
+                success=True,
+                duration_ms=self._get_total_duration(),
+                stage_results=result.stage_results,
+                predictions=predictions
+            )
+            
             logger.info(f"Pipeline execution completed successfully in {self._get_total_duration():.2f}ms")
             
             return result
@@ -146,8 +160,19 @@ class PipelineController:
             
             logger.error(f"Pipeline execution failed: {e}")
             
-            # Return partial result with error information
-            return self._create_error_result(symbol, str(e))
+            # Create error result
+            error_result = self._create_error_result(symbol, str(e))
+            
+            # Record failed pipeline execution metrics
+            self.performance_monitor.record_pipeline_execution(
+                execution_id=self.execution_id,
+                success=False,
+                duration_ms=self._get_total_duration(),
+                stage_results=error_result.stage_results,
+                predictions=[]
+            )
+            
+            return error_result
     
     def _execute_data_collection_stage(self, symbol: str) -> tuple[pd.DataFrame, pd.DataFrame]:
         """Execute data collection stage with error handling and recovery.
