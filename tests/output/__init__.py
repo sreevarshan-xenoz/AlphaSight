@@ -1,0 +1,1 @@
+# tests/output/__init__.py
