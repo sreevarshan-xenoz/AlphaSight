@@ -1,1 +1,1 @@
-# Data collection and management module
+# Data module for NIFTY 50 ML Pipeline
