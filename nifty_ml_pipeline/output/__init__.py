@@ -7,8 +7,10 @@ This module handles prediction result formatting, storage, and performance repor
 
 from .prediction_formatter import PredictionFormatter
 from .prediction_storage import PredictionStorage
+from .performance_reporter import PerformanceReporter
 
 __all__ = [
     'PredictionFormatter',
-    'PredictionStorage'
+    'PredictionStorage',
+    'PerformanceReporter'
 ]
