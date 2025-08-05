@@ -1,8 +1,16 @@
 # nifty_ml_pipeline/data/models.py
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
+from enum import Enum
 import pandas as pd
+
+
+class PipelineStage(Enum):
+    """Pipeline execution stages."""
+    DATA_COLLECTION = "data_collection"
+    FEATURE_ENGINEERING = "feature_engineering"
+    MODEL_INFERENCE = "model_inference"
 
 
 @dataclass
@@ -141,3 +149,48 @@ class PredictionResult:
     def is_actionable(self, min_confidence: float = 0.7) -> bool:
         """Check if prediction confidence meets actionable threshold."""
         return self.confidence >= min_confidence
+
+
+@dataclass
+class PipelineResult:
+    """Complete result of pipeline execution.
+    
+    Contains execution metadata, stage results, and generated predictions
+    for comprehensive tracking and monitoring.
+    """
+    execution_id: str
+    symbol: str
+    start_time: datetime
+    end_time: datetime
+    status: str
+    total_duration_ms: float
+    stage_results: List[Dict[str, Any]]
+    predictions: List[Dict[str, Any]]
+    error_message: Optional[str] = None
+    metadata: Optional[Dict[str, Any]] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for serialization."""
+        return {
+            "execution_id": self.execution_id,
+            "symbol": self.symbol,
+            "start_time": self.start_time.isoformat(),
+            "end_time": self.end_time.isoformat(),
+            "status": self.status,
+            "total_duration_ms": self.total_duration_ms,
+            "stage_results": self.stage_results,
+            "predictions": self.predictions,
+            "error_message": self.error_message,
+            "metadata": self.metadata
+        }
+
+    def was_successful(self) -> bool:
+        """Check if pipeline execution was successful."""
+        return self.status in ["completed", "partial_success"]
+
+    def get_stage_duration(self, stage: PipelineStage) -> Optional[float]:
+        """Get duration for a specific stage."""
+        for result in self.stage_results:
+            if result.get("stage") == stage.value:
+                return result.get("duration_ms")
+        return None
