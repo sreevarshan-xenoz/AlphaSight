@@ -124,7 +124,7 @@ class TestPipelineController:
         mock_normalizer.return_value.create_feature_vectors.return_value = mock_feature_data
         
         # Mock prediction result
-        mock_prediction = Mock()
+        mock_prediction = MagicMock()
         mock_prediction.__dict__ = {
             'timestamp': datetime.now(),
             'symbol': 'NIFTY 50',
@@ -239,7 +239,7 @@ class TestPipelineController:
         mock_normalizer.return_value.create_feature_vectors.return_value = mock_feature_data
         
         # Mock slow prediction
-        mock_prediction = Mock()
+        mock_prediction = MagicMock()
         mock_prediction.__dict__ = {
             'timestamp': datetime.now(),
             'symbol': 'NIFTY 50',

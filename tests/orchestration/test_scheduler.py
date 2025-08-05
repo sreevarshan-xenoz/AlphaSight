@@ -205,10 +205,16 @@ class TestTaskScheduler:
         
         # Test start
         with patch.object(scheduler, '_scheduler_loop') as mock_loop:
+            # Make the mock loop block briefly to keep thread alive
+            import threading
+            mock_loop.side_effect = lambda: threading.Event().wait(0.1)
+            
             scheduler.start_scheduler()
             
             assert scheduler.is_running
             assert scheduler.scheduler_thread is not None
+            # Give thread a moment to start
+            time.sleep(0.05)
             assert scheduler.scheduler_thread.is_alive()
         
         # Test stop

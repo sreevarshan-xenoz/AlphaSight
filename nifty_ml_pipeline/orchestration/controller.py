@@ -404,6 +404,14 @@ class PipelineController:
         Returns:
             PipelineResult object with error information
         """
+        # Convert stage results to dictionaries with string values
+        stage_results_dict = []
+        for result in self.stage_results:
+            result_dict = result.__dict__.copy()
+            result_dict['stage'] = result.stage.value
+            result_dict['status'] = result.status.value
+            stage_results_dict.append(result_dict)
+        
         return PipelineResult(
             execution_id=self.execution_id,
             symbol=symbol,
@@ -411,7 +419,7 @@ class PipelineController:
             end_time=self.end_time,
             status=self.status.value,
             total_duration_ms=self._get_total_duration(),
-            stage_results=[result.__dict__ for result in self.stage_results],
+            stage_results=stage_results_dict,
             predictions=[],
             error_message=error_message,
             metadata={
