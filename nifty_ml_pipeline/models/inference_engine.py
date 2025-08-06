@@ -18,15 +18,20 @@ class InferenceEngine:
     scoring and result formatting for trading applications.
     """
     
-    def __init__(self, model_path: Optional[str] = None, 
+    def __init__(self, predictor: Optional[XGBoostPredictor] = None, 
+                 model_path: Optional[str] = None,
                  confidence_threshold: float = 0.6):
         """Initialize inference engine with pre-trained model.
         
         Args:
-            model_path: Path to pre-trained XGBoost model
+            predictor: Pre-initialized XGBoostPredictor instance
+            model_path: Path to pre-trained XGBoost model (if predictor not provided)
             confidence_threshold: Minimum confidence for actionable predictions
         """
-        self.predictor = XGBoostPredictor(model_path)
+        if predictor is not None:
+            self.predictor = predictor
+        else:
+            self.predictor = XGBoostPredictor(model_path)
         self.confidence_threshold = confidence_threshold
         self.prediction_cache = {}  # Simple cache for repeated predictions
         self.performance_metrics = {
