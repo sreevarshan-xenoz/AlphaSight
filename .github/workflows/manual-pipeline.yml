@@ -1,0 +1,166 @@
+name: Manual Pipeline Execution
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: 'Stock symbol to analyze (default: NIFTY50)'
+        required: false
+        default: 'NIFTY50'
+        type: string
+      debug_mode:
+        description: 'Enable debug logging'
+        required: false
+        default: false
+        type: boolean
+      skip_data_collection:
+        description: 'Skip data collection (use cached data)'
+        required: false
+        default: false
+        type: boolean
+      performance_test:
+        description: 'Run performance benchmarks'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.10'
+
+jobs:
+  manual-execution:
+    name: Manual Pipeline Execution
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Create directories
+      run: |
+        mkdir -p data/cache data/models data/logs
+    
+    - name: Set environment variables
+      run: |
+        echo "LOG_LEVEL=${{ github.event.inputs.debug_mode == 'true' && 'DEBUG' || 'INFO' }}" >> $GITHUB_ENV
+        echo "SYMBOL=${{ github.event.inputs.symbol }}" >> $GITHUB_ENV
+        echo "SKIP_DATA_COLLECTION=${{ github.event.inputs.skip_data_collection }}" >> $GITHUB_ENV
+    
+    - name: Run pipeline with custom parameters
+      id: pipeline
+      env:
+        NSE_API_KEY: ${{ secrets.NSE_API_KEY }}
+        ECONOMIC_TIMES_API_KEY: ${{ secrets.ECONOMIC_TIMES_API_KEY }}
+        PYTHONPATH: ${{ github.workspace }}
+      run: |
+        echo "Starting manual pipeline execution for ${{ env.SYMBOL }}"
+        echo "Debug mode: ${{ github.event.inputs.debug_mode }}"
+        echo "Skip data collection: ${{ github.event.inputs.skip_data_collection }}"
+        
+        python -c "
+        import sys
+        import os
+        from nifty_ml_pipeline.orchestration.controller import PipelineController
+        from config.settings import get_config
+        
+        try:
+            config = get_config()
+            controller = PipelineController(config)
+            result = controller.execute_pipeline('${{ env.SYMBOL }}')
+            
+            if result.was_successful():
+                print('✅ Pipeline execution completed successfully')
+                print(f'Predictions generated: {len(result.predictions)}')
+                print(f'Total duration: {result.total_duration_ms:.2f}ms')
+                sys.exit(0)
+            else:
+                print('❌ Pipeline execution failed')
+                print(f'Error: {result.error_message}')
+                sys.exit(1)
+        except Exception as e:
+            print(f'❌ Pipeline execution failed with exception: {e}')
+            sys.exit(1)
+        " 2>&1 | tee manual_pipeline.log
+    
+    - name: Run performance benchmarks
+      if: github.event.inputs.performance_test == 'true'
+      run: |
+        echo "Running performance benchmarks..."
+        pytest tests/test_performance_benchmarks.py -v --tb=short 2>&1 | tee performance_benchmarks.log
+    
+    - name: Generate execution summary
+      if: always()
+      run: |
+        cat << EOF > execution_summary.md
+        # Manual Pipeline Execution Summary
+        
+        **Execution Time:** $(date)
+        **Symbol:** ${{ github.event.inputs.symbol }}
+        **Debug Mode:** ${{ github.event.inputs.debug_mode }}
+        **Skip Data Collection:** ${{ github.event.inputs.skip_data_collection }}
+        **Performance Test:** ${{ github.event.inputs.performance_test }}
+        **Status:** ${{ steps.pipeline.outcome }}
+        
+        ## Configuration
+        - Python Version: ${{ env.PYTHON_VERSION }}
+        - Repository: ${{ github.repository }}
+        - Branch: ${{ github.ref_name }}
+        - Commit: ${{ github.sha }}
+        - Triggered by: ${{ github.actor }}
+        
+        ## Execution Details
+        $( [ "${{ steps.pipeline.outcome }}" == "success" ] && echo "✅ Pipeline completed successfully" || echo "❌ Pipeline execution failed" )
+        
+        ## Logs
+        Check the uploaded artifacts for detailed logs and outputs.
+        EOF
+    
+    - name: Upload execution artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: manual-execution-${{ github.run_number }}
+        path: |
+          manual_pipeline.log
+          performance_benchmarks.log
+          execution_summary.md
+          pipeline.log
+          data/
+        retention-days: 7
+    
+    - name: Comment on commit
+      uses: actions/github-script@v6
+      if: always()
+      with:
+        script: |
+          const status = '${{ steps.pipeline.outcome }}' === 'success' ? '✅ Success' : '❌ Failed';
+          const symbol = '${{ github.event.inputs.symbol }}';
+          const debugMode = '${{ github.event.inputs.debug_mode }}';
+          const perfTest = '${{ github.event.inputs.performance_test }}';
+          
+          const body = `## Manual Pipeline Execution ${status}
+          
+          **Symbol:** ${symbol}
+          **Debug Mode:** ${debugMode}
+          **Performance Test:** ${perfTest}
+          **Run ID:** ${{ github.run_id }}
+          **Artifacts:** Available for 7 days
+          
+          View detailed logs in the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).`;
+          
+          github.rest.repos.createCommitComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            commit_sha: context.sha,
+            body: body
+          });
