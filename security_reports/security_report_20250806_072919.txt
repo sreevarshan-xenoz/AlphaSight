@@ -1,0 +1,1449 @@
+================================================================================
+SECURITY AUDIT REPORT
+================================================================================
+Generated: 2025-08-06 07:29:19
+Total Findings: 238
+Risk Score: 100/100
+
+FINDINGS BY SEVERITY:
+  Critical: 0
+  High:     6
+  Medium:   231
+  Low:      0
+  Info:     1
+
+DETAILED FINDINGS:
+----------------------------------------
+
+HIGH SEVERITY:
+
+1. Use of eval() function
+   Category: CODE
+   Description: Potentially insecure code pattern detected
+   Location: scripts\security_audit.py:87
+   Recommendation: Review and secure this code pattern
+
+2. Use of exec() function
+   Category: CODE
+   Description: Potentially insecure code pattern detected
+   Location: scripts\security_audit.py:88
+   Recommendation: Review and secure this code pattern
+
+3. Use of os.system()
+   Category: CODE
+   Description: Potentially insecure code pattern detected
+   Location: scripts\security_audit.py:90
+   Recommendation: Review and secure this code pattern
+
+4. Unsafe pickle usage
+   Category: CODE
+   Description: Potentially insecure code pattern detected
+   Location: nifty_ml_pipeline\features\feature_normalizer.py:434
+   Recommendation: Review and secure this code pattern
+
+5. Unsafe pickle usage
+   Category: CODE
+   Description: Potentially insecure code pattern detected
+   Location: nifty_ml_pipeline\models\predictor.py:236
+   Recommendation: Review and secure this code pattern
+
+6. Password in logs
+   Category: CODE
+   Description: Potential password logging detected
+   Location: nifty_ml_pipeline\utils\alerting.py
+   Recommendation: Avoid logging sensitive information
+
+MEDIUM SEVERITY:
+
+1. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .coverage
+   Recommendation: Restrict file permissions
+
+2. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .env.example
+   Recommendation: Restrict file permissions
+
+3. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .gitignore
+   Recommendation: Restrict file permissions
+
+4. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: LICENSE
+   Recommendation: Restrict file permissions
+
+5. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: Makefile
+   Recommendation: Restrict file permissions
+
+6. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: pipeline.log
+   Recommendation: Restrict file permissions
+
+7. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: pyproject.toml
+   Recommendation: Restrict file permissions
+
+8. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: README.md
+   Recommendation: Restrict file permissions
+
+9. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: requirements.txt
+   Recommendation: Restrict file permissions
+
+10. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: setup.py
+   Recommendation: Restrict file permissions
+
+11. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\COMMIT_EDITMSG
+   Recommendation: Restrict file permissions
+
+12. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\config
+   Recommendation: Restrict file permissions
+
+13. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\description
+   Recommendation: Restrict file permissions
+
+14. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\FETCH_HEAD
+   Recommendation: Restrict file permissions
+
+15. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\HEAD
+   Recommendation: Restrict file permissions
+
+16. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\index
+   Recommendation: Restrict file permissions
+
+17. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\ORIG_HEAD
+   Recommendation: Restrict file permissions
+
+18. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\packed-refs
+   Recommendation: Restrict file permissions
+
+19. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .pytest_cache\.gitignore
+   Recommendation: Restrict file permissions
+
+20. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .pytest_cache\CACHEDIR.TAG
+   Recommendation: Restrict file permissions
+
+21. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .pytest_cache\README.md
+   Recommendation: Restrict file permissions
+
+22. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: config\manager.py
+   Recommendation: Restrict file permissions
+
+23. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: config\production.py
+   Recommendation: Restrict file permissions
+
+24. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: config\settings.py
+   Recommendation: Restrict file permissions
+
+25. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: config\validator.py
+   Recommendation: Restrict file permissions
+
+26. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: config\__init__.py
+   Recommendation: Restrict file permissions
+
+27. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: examples\data_collection_demo.py
+   Recommendation: Restrict file permissions
+
+28. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\.gitignore
+   Recommendation: Restrict file permissions
+
+29. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\class_index.html
+   Recommendation: Restrict file permissions
+
+30. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\coverage_html_cb_497bf287.js
+   Recommendation: Restrict file permissions
+
+31. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\favicon_32_cb_58284776.png
+   Recommendation: Restrict file permissions
+
+32. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\function_index.html
+   Recommendation: Restrict file permissions
+
+33. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\index.html
+   Recommendation: Restrict file permissions
+
+34. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\keybd_closed_cb_ce680311.png
+   Recommendation: Restrict file permissions
+
+35. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\status.json
+   Recommendation: Restrict file permissions
+
+36. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\style_cb_dca529e9.css
+   Recommendation: Restrict file permissions
+
+37. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_0ba551ca872c2b2d___init___py.html
+   Recommendation: Restrict file permissions
+
+38. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_158a18b0306f1770_feature_normalizer_py.html
+   Recommendation: Restrict file permissions
+
+39. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_158a18b0306f1770_sentiment_analysis_py.html
+   Recommendation: Restrict file permissions
+
+40. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_158a18b0306f1770_technical_indicators_py.html
+   Recommendation: Restrict file permissions
+
+41. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_158a18b0306f1770___init___py.html
+   Recommendation: Restrict file permissions
+
+42. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_1660bf95c00aa1b2_collectors_py.html
+   Recommendation: Restrict file permissions
+
+43. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_1660bf95c00aa1b2_models_py.html
+   Recommendation: Restrict file permissions
+
+44. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_1660bf95c00aa1b2_storage_py.html
+   Recommendation: Restrict file permissions
+
+45. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_1660bf95c00aa1b2_validator_py.html
+   Recommendation: Restrict file permissions
+
+46. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_1660bf95c00aa1b2___init___py.html
+   Recommendation: Restrict file permissions
+
+47. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_777c4c6b03de9162_inference_engine_py.html
+   Recommendation: Restrict file permissions
+
+48. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_777c4c6b03de9162_predictor_py.html
+   Recommendation: Restrict file permissions
+
+49. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_777c4c6b03de9162_validator_py.html
+   Recommendation: Restrict file permissions
+
+50. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_777c4c6b03de9162___init___py.html
+   Recommendation: Restrict file permissions
+
+51. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_878a9db600262234_performance_reporter_py.html
+   Recommendation: Restrict file permissions
+
+52. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_878a9db600262234_prediction_formatter_py.html
+   Recommendation: Restrict file permissions
+
+53. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_878a9db600262234_prediction_storage_py.html
+   Recommendation: Restrict file permissions
+
+54. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_878a9db600262234___init___py.html
+   Recommendation: Restrict file permissions
+
+55. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_87d25d0e0345bc43_controller_py.html
+   Recommendation: Restrict file permissions
+
+56. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_87d25d0e0345bc43_error_handler_py.html
+   Recommendation: Restrict file permissions
+
+57. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_87d25d0e0345bc43_performance_monitor_py.html
+   Recommendation: Restrict file permissions
+
+58. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_87d25d0e0345bc43_scheduler_py.html
+   Recommendation: Restrict file permissions
+
+59. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_87d25d0e0345bc43___init___py.html
+   Recommendation: Restrict file permissions
+
+60. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_9277be4fadcbd23b_main_py.html
+   Recommendation: Restrict file permissions
+
+61. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: htmlcov\z_9277be4fadcbd23b___init___py.html
+   Recommendation: Restrict file permissions
+
+62. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\main.py
+   Recommendation: Restrict file permissions
+
+63. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\__init__.py
+   Recommendation: Restrict file permissions
+
+64. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: scripts\deployment_validator.py
+   Recommendation: Restrict file permissions
+
+65. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: scripts\performance_profiler.py
+   Recommendation: Restrict file permissions
+
+66. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: scripts\security_audit.py
+   Recommendation: Restrict file permissions
+
+67. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: scripts\test_config.py
+   Recommendation: Restrict file permissions
+
+68. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\TASK_10_1_VALIDATION_SUMMARY.md
+   Recommendation: Restrict file permissions
+
+69. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\test_config.py
+   Recommendation: Restrict file permissions
+
+70. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\test_data_models.py
+   Recommendation: Restrict file permissions
+
+71. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\test_end_to_end_validation.py
+   Recommendation: Restrict file permissions
+
+72. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\test_integration.py
+   Recommendation: Restrict file permissions
+
+73. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\test_main.py
+   Recommendation: Restrict file permissions
+
+74. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\test_performance_benchmarks.py
+   Recommendation: Restrict file permissions
+
+75. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\test_system_validation.py
+   Recommendation: Restrict file permissions
+
+76. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\test_system_validation_report.py
+   Recommendation: Restrict file permissions
+
+77. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\__init__.py
+   Recommendation: Restrict file permissions
+
+78. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\applypatch-msg.sample
+   Recommendation: Restrict file permissions
+
+79. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\commit-msg.sample
+   Recommendation: Restrict file permissions
+
+80. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\fsmonitor-watchman.sample
+   Recommendation: Restrict file permissions
+
+81. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\post-update.sample
+   Recommendation: Restrict file permissions
+
+82. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\pre-applypatch.sample
+   Recommendation: Restrict file permissions
+
+83. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\pre-commit.sample
+   Recommendation: Restrict file permissions
+
+84. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\pre-merge-commit.sample
+   Recommendation: Restrict file permissions
+
+85. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\pre-push.sample
+   Recommendation: Restrict file permissions
+
+86. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\pre-rebase.sample
+   Recommendation: Restrict file permissions
+
+87. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\pre-receive.sample
+   Recommendation: Restrict file permissions
+
+88. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\prepare-commit-msg.sample
+   Recommendation: Restrict file permissions
+
+89. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\push-to-checkout.sample
+   Recommendation: Restrict file permissions
+
+90. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\sendemail-validate.sample
+   Recommendation: Restrict file permissions
+
+91. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\hooks\update.sample
+   Recommendation: Restrict file permissions
+
+92. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\info\exclude
+   Recommendation: Restrict file permissions
+
+93. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\logs\HEAD
+   Recommendation: Restrict file permissions
+
+94. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\logs\refs\heads\main
+   Recommendation: Restrict file permissions
+
+95. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\logs\refs\remotes\origin\HEAD
+   Recommendation: Restrict file permissions
+
+96. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\logs\refs\remotes\origin\main
+   Recommendation: Restrict file permissions
+
+97. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\refs\heads\main
+   Recommendation: Restrict file permissions
+
+98. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\refs\remotes\origin\HEAD
+   Recommendation: Restrict file permissions
+
+99. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .git\refs\remotes\origin\main
+   Recommendation: Restrict file permissions
+
+100. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .github\workflows\ci.yml
+   Recommendation: Restrict file permissions
+
+101. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .github\workflows\health-check.yml
+   Recommendation: Restrict file permissions
+
+102. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .github\workflows\manual-pipeline.yml
+   Recommendation: Restrict file permissions
+
+103. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .kiro\specs\nifty-50-ml-pipeline\design.md
+   Recommendation: Restrict file permissions
+
+104. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .kiro\specs\nifty-50-ml-pipeline\requirements.md
+   Recommendation: Restrict file permissions
+
+105. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .kiro\specs\nifty-50-ml-pipeline\tasks.md
+   Recommendation: Restrict file permissions
+
+106. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .pytest_cache\v\cache\lastfailed
+   Recommendation: Restrict file permissions
+
+107. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: .pytest_cache\v\cache\nodeids
+   Recommendation: Restrict file permissions
+
+108. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: config\environments\development.env
+   Recommendation: Restrict file permissions
+
+109. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: config\environments\production.env
+   Recommendation: Restrict file permissions
+
+110. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: config\environments\staging.env
+   Recommendation: Restrict file permissions
+
+111. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: config\__pycache__\manager.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+112. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: config\__pycache__\settings.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+113. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: config\__pycache__\validator.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+114. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: config\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+115. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: demo_data\news\year=2025\month=07\news_2025-07.parquet
+   Recommendation: Restrict file permissions
+
+116. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: demo_data\news\year=2025\month=08\news_2025-08.parquet
+   Recommendation: Restrict file permissions
+
+117. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: docs\api\README.md
+   Recommendation: Restrict file permissions
+
+118. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: docs\deployment\configuration-options.md
+   Recommendation: Restrict file permissions
+
+119. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: docs\deployment\configuration.md
+   Recommendation: Restrict file permissions
+
+120. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: docs\deployment\performance-tuning.md
+   Recommendation: Restrict file permissions
+
+121. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: docs\deployment\README.md
+   Recommendation: Restrict file permissions
+
+122. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: docs\deployment\troubleshooting.md
+   Recommendation: Restrict file permissions
+
+123. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: docs\api\data\README.md
+   Recommendation: Restrict file permissions
+
+124. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: docs\api\features\README.md
+   Recommendation: Restrict file permissions
+
+125. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: docs\api\models\README.md
+   Recommendation: Restrict file permissions
+
+126. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\data\collectors.py
+   Recommendation: Restrict file permissions
+
+127. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\data\models.py
+   Recommendation: Restrict file permissions
+
+128. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\data\storage.py
+   Recommendation: Restrict file permissions
+
+129. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\data\validator.py
+   Recommendation: Restrict file permissions
+
+130. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\data\__init__.py
+   Recommendation: Restrict file permissions
+
+131. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\features\feature_normalizer.py
+   Recommendation: Restrict file permissions
+
+132. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\features\sentiment_analysis.py
+   Recommendation: Restrict file permissions
+
+133. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\features\technical_indicators.py
+   Recommendation: Restrict file permissions
+
+134. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\features\__init__.py
+   Recommendation: Restrict file permissions
+
+135. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\models\inference_engine.py
+   Recommendation: Restrict file permissions
+
+136. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\models\predictor.py
+   Recommendation: Restrict file permissions
+
+137. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\models\validator.py
+   Recommendation: Restrict file permissions
+
+138. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\models\__init__.py
+   Recommendation: Restrict file permissions
+
+139. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\orchestration\controller.py
+   Recommendation: Restrict file permissions
+
+140. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\orchestration\error_handler.py
+   Recommendation: Restrict file permissions
+
+141. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\orchestration\performance_monitor.py
+   Recommendation: Restrict file permissions
+
+142. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\orchestration\scheduler.py
+   Recommendation: Restrict file permissions
+
+143. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\orchestration\__init__.py
+   Recommendation: Restrict file permissions
+
+144. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\output\performance_reporter.py
+   Recommendation: Restrict file permissions
+
+145. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\output\prediction_formatter.py
+   Recommendation: Restrict file permissions
+
+146. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\output\prediction_storage.py
+   Recommendation: Restrict file permissions
+
+147. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\output\__init__.py
+   Recommendation: Restrict file permissions
+
+148. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\utils\alerting.py
+   Recommendation: Restrict file permissions
+
+149. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\utils\__init__.py
+   Recommendation: Restrict file permissions
+
+150. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\__pycache__\main.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+151. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+152. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\data\__pycache__\collectors.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+153. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\data\__pycache__\models.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+154. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\data\__pycache__\storage.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+155. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\data\__pycache__\validator.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+156. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\data\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+157. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\features\__pycache__\feature_normalizer.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+158. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\features\__pycache__\sentiment_analysis.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+159. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\features\__pycache__\technical_indicators.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+160. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\features\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+161. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\models\__pycache__\inference_engine.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+162. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\models\__pycache__\predictor.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+163. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\models\__pycache__\validator.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+164. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\models\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+165. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\orchestration\__pycache__\controller.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+166. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\orchestration\__pycache__\error_handler.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+167. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\orchestration\__pycache__\performance_monitor.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+168. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\orchestration\__pycache__\scheduler.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+169. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\orchestration\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+170. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\output\__pycache__\performance_reporter.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+171. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\output\__pycache__\prediction_formatter.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+172. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\output\__pycache__\prediction_storage.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+173. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: nifty_ml_pipeline\output\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+174. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\data\test_collectors.py
+   Recommendation: Restrict file permissions
+
+175. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\data\test_storage.py
+   Recommendation: Restrict file permissions
+
+176. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\data\__init__.py
+   Recommendation: Restrict file permissions
+
+177. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\features\test_feature_normalizer.py
+   Recommendation: Restrict file permissions
+
+178. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\features\test_sentiment_analysis.py
+   Recommendation: Restrict file permissions
+
+179. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\features\test_technical_indicators.py
+   Recommendation: Restrict file permissions
+
+180. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\features\__init__.py
+   Recommendation: Restrict file permissions
+
+181. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\models\test_inference_engine.py
+   Recommendation: Restrict file permissions
+
+182. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\models\test_predictor.py
+   Recommendation: Restrict file permissions
+
+183. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\models\test_validator.py
+   Recommendation: Restrict file permissions
+
+184. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\models\__init__.py
+   Recommendation: Restrict file permissions
+
+185. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\orchestration\test_controller.py
+   Recommendation: Restrict file permissions
+
+186. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\orchestration\test_error_handler.py
+   Recommendation: Restrict file permissions
+
+187. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\orchestration\test_performance_monitor.py
+   Recommendation: Restrict file permissions
+
+188. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\orchestration\test_scheduler.py
+   Recommendation: Restrict file permissions
+
+189. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\orchestration\__init__.py
+   Recommendation: Restrict file permissions
+
+190. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\output\test_performance_reporter.py
+   Recommendation: Restrict file permissions
+
+191. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\output\test_prediction_formatter.py
+   Recommendation: Restrict file permissions
+
+192. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\output\test_prediction_storage.py
+   Recommendation: Restrict file permissions
+
+193. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\output\__init__.py
+   Recommendation: Restrict file permissions
+
+194. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\utils\test_helpers.py
+   Recommendation: Restrict file permissions
+
+195. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\utils\__init__.py
+   Recommendation: Restrict file permissions
+
+196. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\__pycache__\test_config.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+197. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\__pycache__\test_config.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+198. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\__pycache__\test_data_models.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+199. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\__pycache__\test_data_models.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+200. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\__pycache__\test_end_to_end_validation.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+201. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\__pycache__\test_integration.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+202. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\__pycache__\test_main.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+203. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\__pycache__\test_performance_benchmarks.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+204. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\__pycache__\test_system_validation.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+205. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\__pycache__\test_system_validation_report.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+206. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+207. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\data\__pycache__\test_collectors.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+208. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\data\__pycache__\test_storage.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+209. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\data\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+210. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\features\__pycache__\test_feature_normalizer.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+211. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\features\__pycache__\test_sentiment_analysis.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+212. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\features\__pycache__\test_technical_indicators.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+213. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\features\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+214. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\models\__pycache__\test_inference_engine.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+215. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\models\__pycache__\test_predictor.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+216. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\models\__pycache__\test_validator.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+217. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\models\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+218. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\orchestration\__pycache__\test_controller.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+219. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\orchestration\__pycache__\test_error_handler.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+220. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\orchestration\__pycache__\test_performance_monitor.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+221. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\orchestration\__pycache__\test_scheduler.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+222. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\orchestration\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+223. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\output\__pycache__\test_performance_reporter.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+224. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\output\__pycache__\test_prediction_formatter.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+225. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\output\__pycache__\test_prediction_storage.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+226. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\output\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+227. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\utils\__pycache__\test_helpers.cpython-312-pytest-8.4.1.pyc
+   Recommendation: Restrict file permissions
+
+228. World-writable file
+   Category: PERMISSION
+   Description: File is writable by all users
+   Location: tests\utils\__pycache__\__init__.cpython-312.pyc
+   Recommendation: Restrict file permissions
+
+229. No rate limiting configuration
+   Category: CONFIG
+   Description: API rate limiting configuration not found
+   Location: config\manager.py
+   Recommendation: Implement API rate limiting
+
+230. No rate limiting configuration
+   Category: CONFIG
+   Description: API rate limiting configuration not found
+   Location: config\validator.py
+   Recommendation: Implement API rate limiting
+
+231. No rate limiting configuration
+   Category: CONFIG
+   Description: API rate limiting configuration not found
+   Location: config\__init__.py
+   Recommendation: Implement API rate limiting
+
+INFO SEVERITY:
+
+1. Safety tool not available
+   Category: DEPENDENCY
+   Description: Could not run dependency vulnerability scan with safety tool
+   Recommendation: Install safety tool: pip install safety
