@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: NIFTY 50 ML Pipeline CI/CD
 
 on:
   push:
@@ -8,16 +8,30 @@ on:
   schedule:
     # Run daily at 5:30 PM IST (12:00 PM UTC)
     - cron: '0 12 * * *'
+  workflow_dispatch:
+    inputs:
+      force_execution:
+        description: 'Force pipeline execution regardless of schedule'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.10'
+  COVERAGE_THRESHOLD: 90
 
 jobs:
   test:
+    name: Test Suite
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.8, 3.9, '3.10', 3.11]
+      fail-fast: false
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
     
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
@@ -48,9 +62,17 @@ jobs:
         black --check nifty_ml_pipeline tests config
         isort --check-only nifty_ml_pipeline tests config
     
-    - name: Run tests with coverage
+    - name: Run unit tests with coverage
       run: |
-        pytest --cov=nifty_ml_pipeline --cov-report=xml --cov-report=term-missing
+        pytest tests/ --cov=nifty_ml_pipeline --cov-report=xml --cov-report=term-missing --cov-fail-under=${{ env.COVERAGE_THRESHOLD }}
+    
+    - name: Run integration tests
+      run: |
+        pytest tests/test_integration.py -v --tb=short
+    
+    - name: Run performance benchmarks
+      run: |
+        pytest tests/test_performance_benchmarks.py -v --tb=short
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -58,38 +80,259 @@ jobs:
         file: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
+        fail_ci_if_error: true
 
-  pipeline-execution:
+  security-scan:
+    name: Security Scan
     runs-on: ubuntu-latest
-    needs: test
-    if: github.event_name == 'schedule'
-    
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
     
-    - name: Set up Python 3.10
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install security tools
+      run: |
+        pip install safety bandit
+    
+    - name: Check for known vulnerabilities
+      run: |
+        safety check --json --output safety-report.json || true
+    
+    - name: Run bandit security linter
+      run: |
+        bandit -r nifty_ml_pipeline -f json -o bandit-report.json || true
+    
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          safety-report.json
+          bandit-report.json
+
+  deployment-validation:
+    name: Deployment Validation
+    runs-on: ubuntu-latest
+    needs: [test, security-scan]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
     
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
+    - name: Validate configuration
+      run: |
+        python -c "from config.settings import get_config; config = get_config(); print('Configuration validation passed')"
+    
+    - name: Test pipeline initialization
+      run: |
+        python -c "
+        from nifty_ml_pipeline.orchestration.controller import PipelineController
+        from config.settings import get_config
+        config = get_config()
+        controller = PipelineController(config)
+        print('Pipeline initialization validation passed')
+        "
+    
+    - name: Validate model loading
+      run: |
+        python -c "
+        from nifty_ml_pipeline.models.predictor import XGBoostPredictor
+        predictor = XGBoostPredictor()
+        print('Model loading validation passed')
+        "
+
+  pipeline-execution:
+    name: Daily Pipeline Execution
+    runs-on: ubuntu-latest
+    needs: [test, deployment-validation]
+    if: github.event_name == 'schedule' || github.event.inputs.force_execution == 'true'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Create data directories
+      run: |
+        mkdir -p data/cache data/models data/logs
+    
     - name: Run ML Pipeline
+      id: pipeline
       env:
         NSE_API_KEY: ${{ secrets.NSE_API_KEY }}
         ECONOMIC_TIMES_API_KEY: ${{ secrets.ECONOMIC_TIMES_API_KEY }}
         LOG_LEVEL: INFO
+        PYTHONPATH: ${{ github.workspace }}
       run: |
-        python -m nifty_ml_pipeline.main
+        echo "Starting pipeline execution at $(date)"
+        python -m nifty_ml_pipeline.main 2>&1 | tee pipeline_execution.log
+        echo "Pipeline execution completed at $(date)"
+      continue-on-error: true
     
-    - name: Upload pipeline logs
+    - name: Check pipeline success
+      id: check_success
+      run: |
+        if [ ${{ steps.pipeline.outcome }} == 'success' ]; then
+          echo "pipeline_success=true" >> $GITHUB_OUTPUT
+          echo "Pipeline executed successfully"
+        else
+          echo "pipeline_success=false" >> $GITHUB_OUTPUT
+          echo "Pipeline execution failed"
+          exit 1
+        fi
+    
+    - name: Upload pipeline artifacts
       uses: actions/upload-artifact@v3
       if: always()
       with:
-        name: pipeline-logs
+        name: pipeline-execution-${{ github.run_number }}
         path: |
           pipeline.log
+          pipeline_execution.log
+          data/
           logs/
+        retention-days: 30
+    
+    - name: Send success notification
+      if: steps.check_success.outputs.pipeline_success == 'true'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number || 1,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '✅ Daily pipeline execution completed successfully at ' + new Date().toISOString()
+          })
+    
+    - name: Send failure notification
+      if: steps.check_success.outputs.pipeline_success == 'false'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: 'Pipeline Execution Failed - ' + new Date().toISOString().split('T')[0],
+            body: '❌ Daily pipeline execution failed. Please check the logs and investigate.\n\nRun ID: ' + context.runId + '\nWorkflow: ' + context.workflow
+          })
+
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: pipeline-execution
+    if: failure() && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Get previous successful commit
+      id: get_commit
+      run: |
+        # Get the last successful workflow run commit
+        LAST_SUCCESS=$(gh run list --workflow=ci.yml --status=success --limit=1 --json headSha --jq '.[0].headSha')
+        echo "last_success_commit=$LAST_SUCCESS" >> $GITHUB_OUTPUT
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Create rollback branch
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git checkout -b rollback-${{ github.run_number }}
+        git reset --hard ${{ steps.get_commit.outputs.last_success_commit }}
+        git push origin rollback-${{ github.run_number }}
+    
+    - name: Create rollback PR
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.pulls.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: 'Rollback: Pipeline Failure Recovery',
+            head: 'rollback-' + context.runNumber,
+            base: 'main',
+            body: '🔄 Automated rollback due to pipeline execution failure.\n\nThis PR reverts to the last known good state.\n\nPlease review and merge if appropriate.'
+          })
+
+  monitoring:
+    name: Pipeline Monitoring
+    runs-on: ubuntu-latest
+    needs: pipeline-execution
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Generate monitoring report
+      run: |
+        cat << EOF > monitoring_report.md
+        # Pipeline Execution Monitoring Report
+        
+        **Date:** $(date)
+        **Run ID:** ${{ github.run_id }}
+        **Trigger:** ${{ github.event_name }}
+        **Status:** ${{ needs.pipeline-execution.result }}
+        
+        ## Execution Summary
+        - **Repository:** ${{ github.repository }}
+        - **Branch:** ${{ github.ref_name }}
+        - **Commit:** ${{ github.sha }}
+        - **Actor:** ${{ github.actor }}
+        
+        ## Pipeline Status
+        - Test Suite: ${{ needs.test.result }}
+        - Security Scan: ${{ needs.security-scan.result }}
+        - Deployment Validation: ${{ needs.deployment-validation.result }}
+        - Pipeline Execution: ${{ needs.pipeline-execution.result }}
+        
+        ## Next Steps
+        $( [ "${{ needs.pipeline-execution.result }}" == "success" ] && echo "✅ Pipeline completed successfully. No action required." || echo "❌ Pipeline failed. Check logs and consider rollback if necessary." )
+        EOF
+    
+    - name: Upload monitoring report
+      uses: actions/upload-artifact@v3
+      with:
+        name: monitoring-report-${{ github.run_number }}
+        path: monitoring_report.md
+    
+    - name: Update pipeline status badge
+      if: github.ref == 'refs/heads/main'
+      run: |
+        STATUS="${{ needs.pipeline-execution.result }}"
+        COLOR=$( [ "$STATUS" == "success" ] && echo "green" || echo "red" )
+        curl -X POST "https://img.shields.io/badge/Pipeline-$STATUS-$COLOR" > pipeline-status.svg
